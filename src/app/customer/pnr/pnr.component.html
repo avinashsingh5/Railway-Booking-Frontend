@@ -1,0 +1,72 @@
+<div class="pnr-container">
+  <div class="pnr-box card">
+    <h2>Check PNR Status</h2>
+    <p class="subtitle">Enter your 10-digit Passenger Name Record number</p>
+
+    <form (ngSubmit)="checkPnr()" class="pnr-form">
+      <div class="input-group">
+        <input
+          type="text"
+          [(ngModel)]="pnrNumber"
+          name="pnrNumber"
+          placeholder="Enter 10-digit PNR"
+          maxlength="10"
+          required
+        />
+        <button type="submit" class="btn btn-primary" [disabled]="loading()">
+          {{ loading() ? 'Checking...' : 'Get Status' }}
+        </button>
+      </div>
+    </form>
+
+    @if (errorMessage()) {
+      <div class="error-banner">{{ errorMessage() }}</div>
+    }
+  </div>
+
+  @if (ticket()) {
+    <div class="ticket-card card mt-3">
+      <div class="ticket-header">
+        <div>
+          <h3>{{ ticket()?.trainName }} <span class="train-num">#{{ ticket()?.trainNumber }}</span></h3>
+          <p class="route-p">{{ ticket()?.boardingStationName }} ({{ ticket()?.boardingStation }}) ➔ {{ ticket()?.destinationStationName }} ({{ ticket()?.destinationStation }})</p>
+        </div>
+        <div>
+          <span class="status-badge" [class.badge-success]="ticket()?.status === 'CONFIRMED'">
+            {{ ticket()?.status }}
+          </span>
+        </div>
+      </div>
+
+      <div class="ticket-meta">
+        <div><small>Date:</small> <strong>{{ ticket()?.boardingDate }}</strong></div>
+        <div><small>Time:</small> <strong>{{ ticket()?.departureTime }}</strong></div>
+        <div><small>Class:</small> <strong>{{ ticket()?.travelClass }}</strong></div>
+        <div><small>Fare:</small> <strong>₹{{ ticket()?.totalFare?.toFixed(2) }}</strong></div>
+      </div>
+
+      <h4>Passenger List</h4>
+      <table class="passengers-table">
+        <thead>
+          <tr>
+            <th>Passenger</th>
+            <th>Age / Gender</th>
+            <th>Seat Number</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of ticket()?.passengers; track p.id) {
+            <tr>
+              <td>{{ p.name }}</td>
+              <td>{{ p.age }} yrs / {{ p.gender }}</td>
+              <td><strong>Seat {{ p.seatNumber }}</strong></td>
+              <td><span class="badge" [class.badge-success]="p.status === 'CONFIRMED'">{{ p.status }}</span></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+

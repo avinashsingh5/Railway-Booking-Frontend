@@ -1,0 +1,109 @@
+<div class="bookings-container">
+  <h2>My Bookings</h2>
+  <p class="subtitle">View journey history, check status, and request cancellations</p>
+
+  @if (errorMessage()) {
+    <div class="error-banner">{{ errorMessage() }}</div>
+  }
+
+  @if (loading()) {
+    <div class="loading-state">Loading your reservations...</div>
+  }
+
+  @if (!loading() && bookings().length === 0) {
+    <div class="empty-state card">
+      <p>You haven't made any reservations yet.</p>
+      <a routerLink="/" class="btn btn-primary mt-2">Book Your First Ticket</a>
+    </div>
+  }
+
+  <div class="bookings-grid">
+    @for (ticket of bookings(); track ticket.id) {
+      <div class="ticket-card card">
+        <div class="ticket-header">
+          <div>
+            <span class="train-title">{{ ticket.trainName }} ({{ ticket.trainNumber }})</span>
+            <div class="ticket-route">{{ ticket.boardingStation }} ➔ {{ ticket.destinationStation }}</div>
+          </div>
+          <div>
+            <span class="status-badge" [ngClass]="getStatusClass(ticket.status)">
+              {{ ticket.status }}
+            </span>
+          </div>
+        </div>
+
+        <div class="ticket-body">
+          <div class="meta-row">
+            <div>
+              <small>PNR</small>
+              <strong>{{ ticket.pnr || 'Not Issued' }}</strong>
+            </div>
+            <div>
+              <small>Date</small>
+              <strong>{{ ticket.boardingDate }}</strong>
+            </div>
+            <div>
+              <small>Class</small>
+              <strong>{{ ticket.travelClass }}</strong>
+            </div>
+            <div>
+              <small>Total Fare</small>
+              <strong>₹{{ ticket.totalFare.toFixed(2) }}</strong>
+            </div>
+          </div>
+
+          <div class="passengers-list">
+            <h4>Passengers</h4>
+            @for (p of ticket.passengers; track p.id) {
+              <div class="passenger-item">
+                <span>{{ p.name }} ({{ p.age }} yrs / {{ p.gender }})</span>
+                <div>
+                  @if (p.seatNumber) {
+                    <span class="seat-badge">Seat {{ p.seatNumber }}</span>
+                  }
+                  <span class="badge" [class.badge-danger]="p.status === 'CANCELLED'">{{ p.status }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        @if (ticket.status === 'CONFIRMED' || ticket.status === 'PARTIALLY_CANCELLED') {
+          <div class="ticket-actions">
+            <button class="btn btn-sm btn-danger" (click)="openCancelModal(ticket)">Cancel Ticket</button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  @if (selectedForCancel()) {
+    <div class="modal-backdrop">
+      <div class="modal-card">
+        <h3>Cancel Ticket (PNR: {{ selectedForCancel()?.pnr }})</h3>
+        <p class="subtitle">Select specific passengers for partial cancellation or cancel all.</p>
+
+        <div class="passenger-select-list">
+          @for (p of activePassengers(); track p.id) {
+            <label class="p-checkbox-label">
+              <input type="checkbox" [checked]="isPassengerSelected(p.id)" (change)="togglePassengerSelection(p.id)" />
+              <span>{{ p.name }} (Seat {{ p.seatNumber }})</span>
+            </label>
+          }
+        </div>
+
+        <div class="refund-rule-notice">
+          ℹ️ Tiered refund rule: 90% refund if ≥24h, 50% refund if 4h-24h, no refund if &lt;4h before departure.
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-outline" (click)="closeCancelModal()">Close</button>
+          <button class="btn btn-danger" (click)="confirmCancellation()" [disabled]="cancelLoading()">
+            {{ cancelLoading() ? 'Cancelling...' : 'Confirm Cancellation' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+

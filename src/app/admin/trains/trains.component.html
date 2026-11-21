@@ -1,0 +1,348 @@
+<div class="admin-container">
+  <!-- Header Section -->
+  <div class="admin-header">
+    <div>
+      <h2>Train Management</h2>
+      <p class="subtitle">Configure train schedules, dynamic route stops, classes, and running days</p>
+    </div>
+    <button class="btn btn-primary" (click)="toggleAddModal()">+ Create New Train</button>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="error-banner">{{ errorMessage() }}</div>
+  }
+
+  <!-- Trains Table Card -->
+  <div class="trains-table-card card">
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Train Number</th>
+            <th>Train Name</th>
+            <th>Route (Source ➔ Destination)</th>
+            <th>Stops Count</th>
+            <th>Configured Classes</th>
+            <th>Running Days</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading()) {
+            <tr>
+              <td colspan="7" class="text-center py-4 text-muted">Loading trains...</td>
+            </tr>
+          }
+          @if (!loading() && trains().length === 0) {
+            <tr>
+              <td colspan="7" class="text-center py-4 text-muted">No trains configured yet. Click "+ Create New Train" to add one.</td>
+            </tr>
+          }
+          @for (train of trains(); track train.id) {
+            <tr>
+              <td><strong class="text-primary">{{ train.trainNumber }}</strong></td>
+              <td class="font-semibold">{{ train.name }}</td>
+              <td>
+                <span class="route-badge">{{ train.source }} ➔ {{ train.destination }}</span>
+              </td>
+              <td>{{ train.stops.length }} stops</td>
+              <td>
+                <div class="chips-wrap">
+                  @for (c of train.classes; track c.travelClass) {
+                    <span class="badge class-chip">{{ c.travelClass }} ({{ c.totalSeats }})</span>
+                  }
+                </div>
+              </td>
+              <td>
+                <span class="days-summary">{{ train.runningDays.length === 7 ? 'Daily' : train.runningDays.join(', ') }}</span>
+              </td>
+              <td class="text-right">
+                <button class="btn btn-sm btn-danger" (click)="deleteTrain(train.id)">Delete</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Dynamic Create Train Modal -->
+  @if (showAddModal()) {
+    <div class="modal-backdrop" (click)="toggleAddModal()">
+      <div class="modal-card wide-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <h3>Create New Train</h3>
+            <p class="modal-subtitle">Configure complete route, seating tiers, and schedules</p>
+          </div>
+          <button type="button" class="close-btn" (click)="toggleAddModal()">✕</button>
+        </div>
+
+        @if (validationError()) {
+          <div class="validation-banner">
+            ⚠️ {{ validationError() }}
+          </div>
+        }
+
+        <form (ngSubmit)="createTrain()" class="modal-form" novalidate>
+          <!-- 1. Basic Train Info -->
+          <div class="form-section">
+            <h4 class="section-title">1. Basic Train Information</h4>
+            <div class="grid-2">
+              <div class="form-group">
+                <label for="trainNumber">Train Number <span class="required">*</span></label>
+                <input
+                  id="trainNumber"
+                  type="text"
+                  name="trainNumber"
+                  [(ngModel)]="trainNumber"
+                  required
+                  placeholder="e.g. 12951"
+                  class="form-control"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="trainName">Train Name <span class="required">*</span></label>
+                <input
+                  id="trainName"
+                  type="text"
+                  name="trainName"
+                  [(ngModel)]="trainName"
+                  required
+                  placeholder="e.g. Mumbai - Delhi Express"
+                  class="form-control"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Route Stops Section -->
+          <div class="form-section">
+            <div class="section-header-row">
+              <div>
+                <h4 class="section-title">2. Route Stops Sequence</h4>
+                <p class="section-subtitle">Origin stop has no arrival time (distance = 0 km). Destination stop has no departure time.</p>
+              </div>
+              <button type="button" class="btn btn-sm btn-outline" (click)="addStop()">
+                + Add Intermediate Stop
+              </button>
+            </div>
+
+            <div class="stops-list">
+              @for (stop of stops; track $index; let isFirst = $first; let isLast = $last) {
+                <div class="stop-card" [class.origin-stop]="isFirst" [class.dest-stop]="isLast">
+                  <div class="stop-tag">
+                    <span class="stop-number">#{{ $index + 1 }}</span>
+                    <span class="stop-role">
+                      {{ isFirst ? 'Origin' : isLast ? 'Destination' : 'Intermediate' }}
+                    </span>
+                  </div>
+
+                  <div class="stop-fields-grid">
+                    <div class="form-group">
+                      <label>Station Code <span class="required">*</span></label>
+                      <input
+                        type="text"
+                        name="code_{{$index}}"
+                        [(ngModel)]="stop.stationCode"
+                        required
+                        maxlength="6"
+                        placeholder="MUM"
+                        class="form-control uppercase"
+                      />
+                    </div>
+
+                    <div class="form-group flex-2">
+                      <label>Station Name <span class="required">*</span></label>
+                      <input
+                        type="text"
+                        name="name_{{$index}}"
+                        [(ngModel)]="stop.stationName"
+                        required
+                        placeholder="Mumbai Central"
+                        class="form-control"
+                      />
+                    </div>
+
+                    <div class="form-group">
+                      <label>Arrival Time</label>
+                      <input
+                        type="time"
+                        name="arr_{{$index}}"
+                        [(ngModel)]="stop.arrivalTime"
+                        [disabled]="isFirst"
+                        [placeholder]="isFirst ? 'None' : '08:30'"
+                        class="form-control"
+                        [class.disabled-input]="isFirst"
+                      />
+                    </div>
+
+                    <div class="form-group">
+                      <label>Departure Time</label>
+                      <input
+                        type="time"
+                        name="dep_{{$index}}"
+                        [(ngModel)]="stop.departureTime"
+                        [disabled]="isLast"
+                        [placeholder]="isLast ? 'None' : '17:00'"
+                        class="form-control"
+                        [class.disabled-input]="isLast"
+                      />
+                    </div>
+
+                    <div class="form-group w-sm">
+                      <label>Day Offset</label>
+                      <input
+                        type="number"
+                        name="day_{{$index}}"
+                        [(ngModel)]="stop.dayOffset"
+                        min="0"
+                        required
+                        class="form-control"
+                      />
+                    </div>
+
+                    <div class="form-group w-md">
+                      <label>Distance (Km) <span class="required">*</span></label>
+                      <input
+                        type="number"
+                        name="dist_{{$index}}"
+                        [(ngModel)]="stop.distanceKm"
+                        [disabled]="isFirst"
+                        min="0"
+                        required
+                        class="form-control"
+                        [class.disabled-input]="isFirst"
+                      />
+                    </div>
+
+                    @if (!isFirst && !isLast) {
+                      <div class="stop-action-cell">
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-icon btn-danger"
+                          title="Remove Stop"
+                          (click)="removeStop($index)"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- 3. Travel Classes Section -->
+          <div class="form-section">
+            <div class="section-header-row">
+              <div>
+                <h4 class="section-title">3. Travel Classes & Seat Configuration</h4>
+                <p class="section-subtitle">Configure seats and per-km pricing for each travel class</p>
+              </div>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline"
+                (click)="addClass()"
+                [disabled]="classes.length >= availableClasses.length"
+              >
+                + Add Class
+              </button>
+            </div>
+
+            <div class="classes-list">
+              @for (cls of classes; track $index) {
+                <div class="class-config-row">
+                  <div class="form-group flex-1">
+                    <label>Travel Class</label>
+                    <select
+                      name="class_{{$index}}"
+                      [(ngModel)]="cls.travelClass"
+                      class="form-control"
+                    >
+                      @for (ac of availableClasses; track ac) {
+                        <option [value]="ac">{{ ac }}</option>
+                      }
+                    </select>
+                  </div>
+
+                  <div class="form-group flex-1">
+                    <label>Total Seats <span class="required">*</span></label>
+                    <input
+                      type="number"
+                      name="seats_{{$index}}"
+                      [(ngModel)]="cls.totalSeats"
+                      min="1"
+                      placeholder="e.g. 72"
+                      required
+                      class="form-control"
+                    />
+                  </div>
+
+                  <div class="form-group flex-1">
+                    <label>Fare Per Km (₹) <span class="required">*</span></label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      name="fare_{{$index}}"
+                      [(ngModel)]="cls.farePerKm"
+                      min="0.01"
+                      placeholder="e.g. 0.60"
+                      required
+                      class="form-control"
+                    />
+                  </div>
+
+                  <div class="class-action-cell">
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-icon btn-danger"
+                      title="Remove Class"
+                      [disabled]="classes.length <= 1"
+                      (click)="removeClass($index)"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- 4. Running Days Section -->
+          <div class="form-section">
+            <h4 class="section-title">4. Operational Days</h4>
+            <p class="section-subtitle">Select which days this train runs</p>
+
+            <div class="days-grid">
+              @for (day of allDays; track day) {
+                <label class="day-checkbox-label" [class.selected]="isDaySelected(day)">
+                  <input
+                    type="checkbox"
+                    [checked]="isDaySelected(day)"
+                    (change)="toggleDay(day)"
+                  />
+                  <span>{{ day }}</span>
+                </label>
+              }
+            </div>
+          </div>
+
+          <!-- Modal Action Footer -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline" (click)="toggleAddModal()">Cancel</button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="submitting()"
+            >
+              {{ submitting() ? 'Creating Train...' : 'Create & Publish Train' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

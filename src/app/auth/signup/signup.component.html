@@ -1,0 +1,63 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <h2>Create an Account</h2>
+    <p class="subtitle">Join to reserve train seats and check live PNR status</p>
+
+    @if (errorMessage()) {
+      <div class="error-banner">{{ errorMessage() }}</div>
+    }
+
+    <form (ngSubmit)="onSignup()" #form="ngForm">
+      <div class="form-group">
+        <label for="name">Full Name</label>
+        <input
+          id="name"
+          name="name"
+          type="text"
+          [(ngModel)]="name"
+          required
+          placeholder="e.g. John Doe"
+          autocomplete="name"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          [(ngModel)]="email"
+          required
+          email
+          placeholder="name@example.com"
+          autocomplete="email"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          [(ngModel)]="password"
+          required
+          minlength="6"
+          placeholder="At least 6 characters"
+          autocomplete="new-password"
+        />
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100" [disabled]="form.invalid || loading()">
+        {{ loading() ? 'Creating account...' : 'Sign Up' }}
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <span>Already have an account? </span>
+      <a routerLink="/login">Sign in</a>
+    </div>
+  </div>
+</div>
+

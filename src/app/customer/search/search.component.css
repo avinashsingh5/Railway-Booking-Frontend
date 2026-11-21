@@ -1,0 +1,275 @@
+.search-page-container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 1rem 1rem 3rem;
+}
+
+.search-hero {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.search-hero h1 {
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.search-hero p {
+  color: #64748b;
+  margin-top: 0.35rem;
+  margin-bottom: 1.5rem;
+}
+
+.search-box {
+  background: #ffffff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+}
+
+.form-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.input-field {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 160px;
+}
+
+.input-field label {
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 0.35rem;
+  text-align: left;
+}
+
+.input-field input, .input-field select {
+  padding: 0.65rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 0.95rem;
+}
+
+.swap-icon {
+  font-size: 1.4rem;
+  color: #94a3b8;
+  margin-bottom: 0.5rem;
+  user-select: none;
+}
+
+.search-btn {
+  height: 42px;
+  padding: 0 1.5rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  margin-top: 2rem;
+  color: #64748b;
+}
+
+.results-container {
+  margin-top: 2.5rem;
+}
+
+.results-container h2 {
+  font-size: 1.35rem;
+  color: #1e293b;
+  margin-bottom: 1rem;
+}
+
+.train-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+
+.train-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.train-header h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.train-num {
+  color: #2563eb;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.journey-schedule {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.time-point {
+  display: flex;
+  flex-direction: column;
+}
+
+.time {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.station-code {
+  font-weight: 700;
+  color: #334155;
+  font-size: 0.95rem;
+}
+
+.station-name {
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.date-str {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.journey-duration {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  max-width: 250px;
+  padding: 0 1rem;
+}
+
+.dist-km {
+  font-size: 0.825rem;
+  color: #64748b;
+  margin-bottom: 0.25rem;
+}
+
+.timeline-bar {
+  width: 100%;
+  height: 2px;
+  background-color: #cbd5e1;
+  position: relative;
+}
+
+.timeline-bar::after {
+  content: '▶';
+  position: absolute;
+  right: -4px;
+  top: -7px;
+  font-size: 10px;
+  color: #94a3b8;
+}
+
+.class-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.class-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.85rem;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.class-name-row {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+}
+
+.class-type {
+  color: #1e293b;
+}
+
+.class-fare {
+  color: #059669;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-available {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.badge-waitlist {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.intermediate-badge {
+  background: #e0f2fe;
+  color: #0369a1;
+  margin-left: 0.5rem;
+}
+
+.route-details-panel {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px dashed #cbd5e1;
+}
+
+.schedule-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+.schedule-table th, .schedule-table td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #f1f5f9;
+  text-align: left;
+}
+
+.schedule-table th {
+  background: #f8fafc;
+  color: #475569;
+}
+
+.error-banner {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.text-right {
+  text-align: right;
+}
+

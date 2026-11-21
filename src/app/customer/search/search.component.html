@@ -1,0 +1,156 @@
+<div class="search-page-container">
+  <div class="search-hero">
+    <h1>Search & Book Train Tickets</h1>
+    <p>Fast, reliable reservation across all major rail corridors</p>
+
+    <div class="search-box card">
+      <form (ngSubmit)="search()" class="search-form">
+        <div class="form-row">
+          <div class="input-field">
+            <label>From (Station Code)</label>
+            <input type="text" name="source" [(ngModel)]="source" placeholder="e.g. MUM" required uppercase />
+          </div>
+
+          <div class="swap-icon">⇌</div>
+
+          <div class="input-field">
+            <label>To (Station Code)</label>
+            <input type="text" name="destination" [(ngModel)]="destination" placeholder="e.g. DEL" required uppercase />
+          </div>
+
+          <div class="input-field">
+            <label>Date of Journey</label>
+            <input type="date" name="date" [(ngModel)]="date" required />
+          </div>
+
+          <div class="input-field">
+            <label>Travel Class (Optional)</label>
+            <select name="travelClass" [(ngModel)]="travelClass">
+              <option value="">All Classes</option>
+              <option value="SL">Sleeper (SL)</option>
+              <option value="AC3">AC 3-Tier (AC3)</option>
+              <option value="AC2">AC 2-Tier (AC2)</option>
+              <option value="AC1">First AC (AC1)</option>
+            </select>
+          </div>
+
+          <div class="action-field">
+            <button type="submit" class="btn btn-primary search-btn" [disabled]="loading()">
+              {{ loading() ? 'Searching...' : 'Find Trains' }}
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+  <div class="error-banner">{{ errorMessage() }}</div>
+  }
+
+  @if (searched() && trains().length === 0 && !loading()) {
+  <div class="empty-state card">
+    <p>No trains found between <strong>{{ source.toUpperCase() }}</strong> and <strong>{{ destination.toUpperCase()
+        }}</strong> for {{ date }}.</p>
+    <small>Try selecting a different date or checking nearby station codes.</small>
+  </div>
+  }
+
+  @if (trains().length > 0) {
+  <div class="results-container">
+    <h2>Available Trains ({{ trains().length }})</h2>
+
+    <div class="trains-list">
+      @for (train of trains(); track train.trainId) {
+      <div class="train-card card">
+        <div class="train-header">
+          <div>
+            <h3>{{ train.trainName }} <span class="train-num">#{{ train.trainNumber }}</span></h3>
+            @if (train.intermediateBooking) {
+            <span class="badge intermediate-badge">Intermediate Station Stop</span>
+            }
+          </div>
+          <button class="btn btn-sm btn-outline" (click)="toggleRoute(train.trainId)">
+            {{ selectedTrainRoute()?.id === train.trainId ? 'Hide Route' : 'View Schedule' }}
+          </button>
+        </div>
+
+        <div class="journey-schedule">
+          <div class="time-point">
+            <span class="time">{{ train.departureTime }}</span>
+            <span class="station-code">{{ train.boardingStation }}</span>
+            <span class="station-name">{{ train.boardingStationName }}</span>
+            <span class="date-str">{{ train.boardingDate }}</span>
+          </div>
+
+          <div class="journey-duration">
+            <span class="dist-km">{{ train.distanceKm }} km</span>
+            <div class="timeline-bar"></div>
+          </div>
+
+          <div class="time-point text-right">
+            <span class="time">{{ train.arrivalTime }}</span>
+            <span class="station-code">{{ train.destinationStation }}</span>
+            <span class="station-name">{{ train.destinationStationName }}</span>
+            <span class="date-str">{{ train.arrivalDate }}</span>
+          </div>
+        </div>
+
+        <div class="class-grid">
+          @for (cls of train.classes; track cls.travelClass) {
+          <div class="class-card" [class.sold-out]="cls.availableSeats <= 0">
+            <div class="class-name-row">
+              <span class="class-type">{{ cls.travelClass }}</span>
+              <span class="class-fare">₹{{ getFare(cls).toFixed(2) }}</span>
+            </div>
+            <div class="seat-info">
+              <span class="badge" [class.badge-available]="cls.availableSeats > 0"
+                [class.badge-waitlist]="cls.availableSeats <= 0">
+                {{ cls.availableSeats > 0 ? cls.availableSeats + ' Available' : '0 Seats (Waitlist)' }}
+              </span>
+              @if (cls.totalSeats) {
+              <small class="text-muted d-block mt-1">Total: {{ cls.totalSeats }}</small>
+              }
+            </div>
+            <button class="btn btn-sm btn-primary w-100 mt-2" (click)="bookTicket(train, cls.travelClass)">
+              Book Now
+            </button>
+          </div>
+          }
+        </div>
+
+        @if (selectedTrainRoute()?.id === train.trainId) {
+        <div class="route-details-panel">
+          <h4>Route Schedule & Stops</h4>
+          <table class="schedule-table">
+            <thead>
+              <tr>
+                <th>Seq</th>
+                <th>Station</th>
+                <th>Arr</th>
+                <th>Dep</th>
+                <th>Day</th>
+                <th>Distance</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (stop of selectedTrainRoute()?.stops; track stop.sequence) {
+              <tr>
+                <td>{{ stop.sequence }}</td>
+                <td><strong>{{ stop.stationCode }}</strong> - {{ stop.stationName }}</td>
+                <td>{{ stop.arrivalTime || 'Source' }}</td>
+                <td>{{ stop.departureTime || 'Destination' }}</td>
+                <td>Day {{ stop.dayOffset + 1 }}</td>
+                <td>{{ stop.distanceKm }} km</td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        }
+      </div>
+      }
+    </div>
+  </div>
+  }
+</div>

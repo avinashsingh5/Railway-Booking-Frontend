@@ -1,0 +1,36 @@
+<header class="app-header">
+  <div class="header-container">
+    <a class="brand" routerLink="/">
+      <span class="brand-name">RAILRESERVE</span>
+    </a>
+
+    <nav class="main-nav">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Search Trains</a>
+      @if (auth.isAuthenticated()) {
+        <a routerLink="/my-bookings" routerLinkActive="active">My Bookings</a>
+      }
+      <a routerLink="/pnr" routerLinkActive="active">PNR Status</a>
+      @if (auth.isAdmin()) {
+        <a routerLink="/admin/trains" routerLinkActive="active" class="admin-link">Manage Trains</a>
+      }
+    </nav>
+
+    <div class="user-actions">
+      @if (auth.currentUser(); as user) {
+        <div class="user-pill">
+          <span class="user-name">{{ user.name }}</span>
+          <span class="role-badge" [class.admin-badge]="user.role === 'ADMIN'">{{ user.role }}</span>
+        </div>
+        <button class="btn btn-sm btn-ghost" (click)="auth.logout()">Logout</button>
+      } @else {
+        <a class="btn btn-sm btn-ghost" routerLink="/login">Sign In</a>
+        <a class="btn btn-sm btn-primary" routerLink="/signup">Sign Up</a>
+      }
+    </div>
+  </div>
+</header>
+
+<main class="main-content">
+  <router-outlet></router-outlet>
+</main>
+

@@ -1,0 +1,49 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <h2>Welcome Back</h2>
+    <p class="subtitle">Log in to book and manage your train tickets</p>
+
+    @if (errorMessage()) {
+      <div class="error-banner">{{ errorMessage() }}</div>
+    }
+
+    <form (ngSubmit)="onLogin()" #form="ngForm">
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          [(ngModel)]="email"
+          required
+          email
+          placeholder="name@example.com"
+          autocomplete="email"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          [(ngModel)]="password"
+          required
+          placeholder="Enter your password"
+          autocomplete="current-password"
+        />
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100" [disabled]="form.invalid || loading()">
+        {{ loading() ? 'Signing in...' : 'Sign In' }}
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <span>Don't have an account? </span>
+      <a routerLink="/signup">Create one now</a>
+    </div>
+  </div>
+</div>
+

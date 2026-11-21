@@ -1,0 +1,103 @@
+.app-header {
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #0f172a;
+}
+
+.brand-name {
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #0f172a;
+  line-height: 1;
+}
+
+.main-nav {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.main-nav a {
+  text-decoration: none;
+  font-size: 0.925rem;
+  font-weight: 500;
+  color: #475569;
+  padding: 0.35rem 0;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s ease-in-out;
+}
+
+.main-nav a:hover {
+  color: #2563eb;
+}
+
+.main-nav a.active {
+  color: #2563eb;
+  font-weight: 600;
+  border-bottom-color: #2563eb;
+}
+
+.admin-link {
+  color: #7c3aed !important;
+}
+
+.user-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.user-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f1f5f9;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.role-badge {
+  font-size: 0.7rem;
+  background: #e2e8f0;
+  color: #475569;
+  padding: 0.15rem 0.45rem;
+  border-radius: 9999px;
+  font-weight: 700;
+}
+
+.admin-badge {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.main-content {
+  min-height: calc(100vh - 70px);
+}
+
