@@ -1,1 +1,1 @@
-export const environment = { apiUrl: 'http://localhost:8080' };
+export const environment = { apiUrl: 'https://13.204.64.81.sslip.io' };
