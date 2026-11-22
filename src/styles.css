@@ -1,6 +1,6 @@
 :root{--ink:#10233f;--paper:#edf0f4;--card:#fff;--signal:#f5b301;--go:#1f7a5a;--stop:#c0392b;--warn:#e07b1a;--muted:#667489;--line:#d5dbe4;--radius:10px}
 *{box-sizing:border-box}
-body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 'IBM Plex Sans',system-ui,sans-serif}
+body{margin:0;background-color:var(--paper);background-image:linear-gradient(rgba(237, 240, 244, 0.65), rgba(237, 240, 244, 0.65)), url('/train-bg.jpg');background-position:center;background-size:cover;background-attachment:fixed;background-repeat:no-repeat;color:var(--ink);font:15px/1.5 'IBM Plex Sans',system-ui,sans-serif;min-height:100vh}
 h1,h2,h3{font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:.01em;margin:0 0 .4rem}
 h1{font-size:2rem}h2{font-size:1.5rem}h3{font-size:1.2rem}
 a{color:inherit}

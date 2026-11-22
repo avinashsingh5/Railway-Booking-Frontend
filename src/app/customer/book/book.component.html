@@ -1,50 +1,50 @@
 <div class="book-container">
   @if (step() === 'PASSENGERS') {
-    <div class="booking-card card">
-      <h2>Complete Your Booking</h2>
-      <p class="subtitle">Review journey parameters and enter passenger details (1-6 travelers).</p>
+  <div class="booking-card card">
+    <h2>Complete Your Booking</h2>
+    <p class="subtitle">Review journey parameters and enter passenger details (1-6 travelers).</p>
 
-      @if (errorMessage()) {
-        <div class="error-banner">{{ errorMessage() }}</div>
+    @if (errorMessage()) {
+    <div class="error-banner">{{ errorMessage() }}</div>
+    }
+
+    <div class="journey-preview">
+      <div class="info-pill"><strong>Journey Date:</strong> {{ journeyDate }}</div>
+      <div class="info-pill"><strong>Class:</strong> {{ travelClass }}</div>
+      <div class="info-pill"><strong>Route:</strong> {{ boardingStation }} ➔ {{ destinationStation }}</div>
+    </div>
+
+    <form (ngSubmit)="proceedToPayment()" #pForm="ngForm">
+      <h3>Passenger Details</h3>
+      @for (p of passengers; track $index) {
+      <div class="passenger-row">
+        <span class="p-index">#{{ $index + 1 }}</span>
+        <div class="form-field flex-2">
+          <label>Name</label>
+          <input type="text" [(ngModel)]="p.name" name="name_{{$index}}" required placeholder="Full Name" />
+        </div>
+        <div class="form-field flex-1">
+          <label>Age</label>
+          <input type="number" [(ngModel)]="p.age" name="age_{{$index}}" required min="1" max="120" placeholder="Age" />
+        </div>
+        <div class="form-field flex-1">
+          <label>Gender</label>
+          <select [(ngModel)]="p.gender" name="gender_{{$index}}">
+            <option value="MALE">Male</option>
+            <option value="FEMALE">Female</option>
+            <option value="OTHER">Other</option>
+          </select>
+        </div>
+        @if (passengers.length > 1) {
+        <button type="button" class="btn btn-sm btn-danger remove-btn" (click)="removePassenger($index)">✕</button>
+        }
+      </div>
       }
 
-      <div class="journey-preview">
-        <div class="info-pill"><strong>Journey Date:</strong> {{ journeyDate }}</div>
-        <div class="info-pill"><strong>Class:</strong> {{ travelClass }}</div>
-        <div class="info-pill"><strong>Route:</strong> {{ boardingStation }} ➔ {{ destinationStation }}</div>
-      </div>
-
-      <form (ngSubmit)="proceedToPayment()" #pForm="ngForm">
-        <h3>Passenger Details</h3>
-        @for (p of passengers; track $index) {
-          <div class="passenger-row">
-            <span class="p-index">#{{ $index + 1 }}</span>
-            <div class="form-field flex-2">
-              <label>Name</label>
-              <input type="text" [(ngModel)]="p.name" name="name_{{$index}}" required placeholder="Full Name" />
-            </div>
-            <div class="form-field flex-1">
-              <label>Age</label>
-              <input type="number" [(ngModel)]="p.age" name="age_{{$index}}" required min="1" max="120" placeholder="Age" />
-            </div>
-            <div class="form-field flex-1">
-              <label>Gender</label>
-              <select [(ngModel)]="p.gender" name="gender_{{$index}}">
-                <option value="MALE">Male</option>
-                <option value="FEMALE">Female</option>
-                <option value="OTHER">Other</option>
-              </select>
-            </div>
-            @if (passengers.length > 1) {
-              <button type="button" class="btn btn-sm btn-danger remove-btn" (click)="removePassenger($index)">✕</button>
-            }
-          </div>
-        }
-
-        @if (passengers.length < 6) {
-          <button type="button" class="btn btn-sm btn-outline add-p-btn" (click)="addPassenger()">
-            + Add Another Passenger
-          </button>
+      @if (passengers.length < 6) { <button type="button" class="btn btn-sm btn-outline add-p-btn"
+        (click)="addPassenger()">
+        + Add Another Passenger
+        </button>
         }
 
         <div class="submit-section">
@@ -52,106 +52,105 @@
             {{ loading() ? 'Reserving Seats...' : 'Confirm & Proceed to Payment' }}
           </button>
         </div>
-      </form>
-    </div>
+    </form>
+  </div>
   }
 
   @if (step() === 'PAYMENT' && reservation()) {
-    <div class="payment-card card">
-      <h2>Complete Payment</h2>
-      <div class="hold-timer">
-        ⏳ Seats held for 15 minutes. Complete payment before:
-        <strong>{{ reservation()?.paymentDueBy | date:'shortTime' }}</strong>
-      </div>
-
-      <div class="fare-summary">
-        <div><strong>Train:</strong> {{ reservation()?.trainName }} ({{ reservation()?.trainNumber }})</div>
-        <div><strong>Travelers:</strong> {{ reservation()?.passengers?.length }} passenger(s)</div>
-        <div class="total-amount"><strong>Total Fare:</strong> ₹{{ reservation()?.totalFare?.toFixed(2) }}</div>
-      </div>
-
-      @if (errorMessage()) {
-        <div class="error-banner">{{ errorMessage() }}</div>
-      }
-
-      <div class="payment-method-selector">
-        <label>Select Payment Method</label>
-        <div class="radio-options">
-          <label class="radio-label">
-            <input type="radio" name="payMethod" [(ngModel)]="paymentMethod" value="UPI" /> UPI (GPay / PhonePe)
-          </label>
-          <label class="radio-label">
-            <input type="radio" name="payMethod" [(ngModel)]="paymentMethod" value="CARD" /> Credit / Debit Card
-          </label>
-          <label class="radio-label">
-            <input type="radio" name="payMethod" [(ngModel)]="paymentMethod" value="NETBANKING" /> Net Banking
-          </label>
-        </div>
-      </div>
-
-      <button class="btn btn-primary w-100" (click)="simulatePayment()" [disabled]="loading()">
-        {{ loading() ? 'Processing Payment...' : 'Pay ₹' + reservation()?.totalFare?.toFixed(2) }}
-      </button>
+  <div class="payment-card card">
+    <h2>Complete Payment</h2>
+    <div class="hold-timer">
+      Complete payment before:
+      <strong>{{ reservation()?.paymentDueBy | date:'shortTime' }}</strong>
     </div>
+
+    <div class="fare-summary">
+      <div><strong>Train:</strong> {{ reservation()?.trainName }} ({{ reservation()?.trainNumber }})</div>
+      <div><strong>Travelers:</strong> {{ reservation()?.passengers?.length }} passenger(s)</div>
+      <div class="total-amount"><strong>Total Fare:</strong> ₹{{ reservation()?.totalFare?.toFixed(2) }}</div>
+    </div>
+
+    @if (errorMessage()) {
+    <div class="error-banner">{{ errorMessage() }}</div>
+    }
+
+    <div class="payment-method-selector">
+      <label>Select Payment Method</label>
+      <div class="radio-options">
+        <label class="radio-label">
+          <input type="radio" name="payMethod" [(ngModel)]="paymentMethod" value="UPI" /> UPI (GPay / PhonePe)
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="payMethod" [(ngModel)]="paymentMethod" value="CARD" /> Credit / Debit Card
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="payMethod" [(ngModel)]="paymentMethod" value="NETBANKING" /> Net Banking
+        </label>
+      </div>
+    </div>
+
+    <button class="btn btn-primary w-100" (click)="simulatePayment()" [disabled]="loading()">
+      {{ loading() ? 'Processing Payment...' : 'Pay ₹' + reservation()?.totalFare?.toFixed(2) }}
+    </button>
+  </div>
   }
 
   @if (step() === 'SUCCESS' && reservation()) {
-    <div class="success-card card">
-      <div class="success-icon">✓</div>
-      <h2>Booking Confirmed!</h2>
-      <p class="subtitle">Your reservation was confirmed and seats allocated successfully.</p>
+  <div class="success-card card">
+    <div class="success-icon">✓</div>
+    <h2>Booking Confirmed!</h2>
+    <p class="subtitle">Your reservation was confirmed and seats allocated successfully.</p>
 
-      <div class="pnr-display">
-        <span class="pnr-title">PNR NUMBER</span>
-        <span class="pnr-number">{{ reservation()?.pnr }}</span>
+    <div class="pnr-display">
+      <span class="pnr-title">PNR NUMBER</span>
+      <span class="pnr-number">{{ reservation()?.pnr }}</span>
+    </div>
+
+    <div class="ticket-details">
+      <div class="detail-row">
+        <span>Train:</span>
+        <strong>{{ reservation()?.trainName }} ({{ reservation()?.trainNumber }})</strong>
       </div>
-
-      <div class="ticket-details">
-        <div class="detail-row">
-          <span>Train:</span>
-          <strong>{{ reservation()?.trainName }} ({{ reservation()?.trainNumber }})</strong>
-        </div>
-        <div class="detail-row">
-          <span>Boarding:</span>
-          <strong>{{ reservation()?.boardingStationName }} ({{ reservation()?.boardingStation }})</strong>
-        </div>
-        <div class="detail-row">
-          <span>Destination:</span>
-          <strong>{{ reservation()?.destinationStationName }} ({{ reservation()?.destinationStation }})</strong>
-        </div>
-        <div class="detail-row">
-          <span>Departure:</span>
-          <strong>{{ reservation()?.boardingDate }} at {{ reservation()?.departureTime }}</strong>
-        </div>
+      <div class="detail-row">
+        <span>Boarding:</span>
+        <strong>{{ reservation()?.boardingStationName }} ({{ reservation()?.boardingStation }})</strong>
       </div>
-
-      <h4>Passenger & Seat Allocation</h4>
-      <table class="passengers-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Age / Gender</th>
-            <th>Seat Number</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (p of reservation()?.passengers; track p.id) {
-            <tr>
-              <td>{{ p.name }}</td>
-              <td>{{ p.age }} yrs / {{ p.gender }}</td>
-              <td><strong>Seat {{ p.seatNumber }}</strong></td>
-              <td><span class="badge badge-success">{{ p.status }}</span></td>
-            </tr>
-          }
-        </tbody>
-      </table>
-
-      <div class="actions-row">
-        <button class="btn btn-primary" routerLink="/my-bookings">View in My Bookings</button>
-        <button class="btn btn-outline" (click)="printTicket()">Print Receipt</button>
+      <div class="detail-row">
+        <span>Destination:</span>
+        <strong>{{ reservation()?.destinationStationName }} ({{ reservation()?.destinationStation }})</strong>
+      </div>
+      <div class="detail-row">
+        <span>Departure:</span>
+        <strong>{{ reservation()?.boardingDate }} at {{ reservation()?.departureTime }}</strong>
       </div>
     </div>
+
+    <h4>Passenger & Seat Allocation</h4>
+    <table class="passengers-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Age / Gender</th>
+          <th>Seat Number</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (p of reservation()?.passengers; track p.id) {
+        <tr>
+          <td>{{ p.name }}</td>
+          <td>{{ p.age }} yrs / {{ p.gender }}</td>
+          <td><strong>Seat {{ p.seatNumber }}</strong></td>
+          <td><span class="badge badge-success">{{ p.status }}</span></td>
+        </tr>
+        }
+      </tbody>
+    </table>
+
+    <div class="actions-row">
+      <button class="btn btn-primary" routerLink="/my-bookings">View in My Bookings</button>
+      <button class="btn btn-outline" (click)="printTicket()">Print Receipt</button>
+    </div>
+  </div>
   }
 </div>
-
